@@ -249,6 +249,52 @@ h1 span {
   right: 16%;
 }
 
+.vietnam-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0 0;
+  padding: 18px 22px;
+  border: 1px solid rgba(102, 88, 232, .12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .8);
+  box-shadow: 0 12px 20px rgba(60, 66, 115, .05);
+}
+
+.vietnam-flag {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f5f1ff 0%, #e7e4ff 100%);
+  font-size: 22px;
+}
+
+.vietnam-label {
+  margin: 0 0 4px;
+  color: #6d6d8d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.vietnam-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.vietnam-clock {
+  margin-left: auto;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 600;
+  letter-spacing: -1.3px;
+  color: var(--ink);
+}
+
 .world-section {
   padding-top: 52px;
 }
@@ -372,11 +418,30 @@ h1 span {
   box-shadow: 0 10px 24px rgba(46, 48, 85, .07);
 }
 
+.city-card.is-muted {
+  opacity: .55;
+  filter: grayscale(.08);
+}
+
 .city-topline {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
+}
+
+.city-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  color: #737d96;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.city-picker input {
+  accent-color: var(--purple);
 }
 
 .city-name {

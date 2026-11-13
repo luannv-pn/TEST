@@ -1,4 +1,5 @@
 const cities = [
+  { name: "Hà Nội", country: "Việt Nam", zone: "Asia/Ho_Chi_Minh", emoji: "🇻🇳" },
   { name: "New York", country: "Hoa Kỳ", zone: "America/New_York", emoji: "🗽" },
   { name: "London", country: "Vương quốc Anh", zone: "Europe/London", emoji: "🇬🇧" },
   { name: "Paris", country: "Pháp", zone: "Europe/Paris", emoji: "🗼" },
@@ -15,10 +16,12 @@ const searchInput = document.querySelector("#city-search");
 const localClock = document.querySelector("#local-clock");
 const localZone = document.querySelector("#local-zone");
 const localDate = document.querySelector("#local-date");
+const vietnamClock = document.querySelector("#vietnam-clock");
 const format24Button = document.querySelector("#format-24");
 const format12Button = document.querySelector("#format-12");
 
 let use24Hour = true;
+const selectedZones = new Set(cities.map(({ zone }) => zone));
 
 const timeFormatter = (zone, hour12 = !use24Hour, seconds = true) => new Intl.DateTimeFormat("vi-VN", {
   timeZone: zone,
@@ -81,7 +84,7 @@ function renderCities() {
     `${name} ${country} ${zone}`.toLocaleLowerCase("vi").includes(query));
 
   cityGrid.innerHTML = filteredCities.map(({ name, country, zone, emoji }) => `
-    <article class="city-card" data-zone="${zone}">
+    <article class="city-card ${selectedZones.has(zone) ? "is-selected" : "is-muted"}" data-zone="${zone}">
       <div class="city-topline">
         <div>
           <h3 class="city-name">${name}</h3>
@@ -89,6 +92,10 @@ function renderCities() {
         </div>
         <span class="city-emoji" aria-hidden="true">${emoji}</span>
       </div>
+      <label class="city-picker">
+        <input type="checkbox" data-city-toggle ${selectedZones.has(zone) ? "checked" : ""}>
+        <span>Hiển thị</span>
+      </label>
       <div class="city-time-row">
         <time class="city-time" data-time></time>
         <span class="city-period" data-period></span>
@@ -113,6 +120,12 @@ function updateClocks() {
   localZone.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("_", " ");
   localDate.textContent = dateFormatter(Intl.DateTimeFormat().resolvedOptions().timeZone).format(now);
 
+  const vietnamTime = timeFormatter("Asia/Ho_Chi_Minh").formatToParts(now);
+  vietnamClock.textContent = vietnamTime
+    .filter(({ type }) => ["hour", "minute", "second", "literal"].includes(type))
+    .map(({ value }) => value)
+    .join("");
+
   cityGrid.querySelectorAll(".city-card").forEach((card) => {
     const zone = card.dataset.zone;
     const timeParts = timeFormatter(zone).formatToParts(now);
@@ -122,6 +135,9 @@ function updateClocks() {
       .join(":");
     const period = timeParts.find(({ type }) => type === "dayPeriod")?.value ?? "";
 
+    const isVisible = selectedZones.has(zone);
+    card.classList.toggle("is-muted", !isVisible);
+    card.querySelector("[data-city-toggle]").checked = isVisible;
     card.querySelector("[data-time]").textContent = time;
     card.querySelector("[data-period]").textContent = period;
     card.querySelector("[data-date]").textContent = dayLabel(getDayDifference(zone, now), now, zone);
@@ -139,6 +155,22 @@ function setHourFormat(use24) {
 }
 
 searchInput.addEventListener("input", renderCities);
+cityGrid.addEventListener("change", (event) => {
+  const toggle = event.target.closest("[data-city-toggle]");
+  if (!toggle) return;
+
+  const card = toggle.closest(".city-card");
+  if (!card) return;
+
+  const zone = card.dataset.zone;
+  if (toggle.checked) {
+    selectedZones.add(zone);
+  } else {
+    selectedZones.delete(zone);
+  }
+
+  renderCities();
+});
 format24Button.addEventListener("click", () => setHourFormat(true));
 format12Button.addEventListener("click", () => setHourFormat(false));
 document.addEventListener("keydown", (event) => {
